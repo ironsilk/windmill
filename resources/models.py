@@ -22,10 +22,11 @@ class TurbineData(db.Model):
 
 
 @dataclass
-class DataLogs(db.Model):
+class DataLog(db.Model):
     __tablename__ = 'job_logs'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    turbine_id: Mapped[int] = mapped_column(Integer)
     job_timestamp: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     last_entry: Mapped[datetime.datetime] = mapped_column(DateTime)
 

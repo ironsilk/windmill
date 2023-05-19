@@ -1,3 +1,5 @@
+from flask_executor import Executor
+
 from dotenv import load_dotenv
 import os
 import json
@@ -7,13 +9,12 @@ from resources.data import fetch_data
 from resources.models import db
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from werkzeug.utils import secure_filename
+from loguru import logger
 from flask import Flask
 from apscheduler.schedulers.background import BackgroundScheduler
+
 load_dotenv()
 
-
-DATA_PATH = os.getenv("DATA_PATH")
 
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
@@ -27,10 +28,10 @@ db_uri = f'postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{DB_IP}:{DB
 
 app = Flask(__name__)
 CORS(app)
-# executor = Executor(app)
+executor = Executor(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
-# app.config['EXECUTOR_TYPE'] = 'thread'
-# app.config['EXECUTOR_PROPAGATE_EXCEPTIONS'] = True
+app.config['EXECUTOR_TYPE'] = 'thread'
+app.config['EXECUTOR_PROPAGATE_EXCEPTIONS'] = True
 db.init_app(app)
 with app.app_context():
     # db.drop_all()
@@ -40,6 +41,7 @@ with app.app_context():
 
 scheduler.add_job(fetch_data, 'interval', minutes=1)
 
+
 @app.route('/', methods=['GET'])
 def home():
     return "ok"
@@ -47,11 +49,14 @@ def home():
 
 @app.route('/fetch', methods=['GET'])
 def trigger_data_fetch():
-    return "ok"
+    logger.info(f"Running user-triggerd data fetching...")
+    executor.submit(fetch_data)
+    return "Data fetching triggered"
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+    with app.app_context():
+        fetch_data()
 
 
 
