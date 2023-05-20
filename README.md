@@ -19,14 +19,15 @@ Data is provided as multiple csv files.
 1. .csv files are to be stored in a provided path, this resource should be accessible to the script/docker.
 2. path to the .csv files can be set via environment variables and volume can be mounted via the dockerfile.
 I'll just copy the datafiles in the dockerfile build for simplicity here.
-3. no other system is dependent on these csv dumps so they may be erased after each interrogation. I've implemented a
+3. One .csv file can be stored in memory at a time.
+4. no other system is dependent on these csv dumps so they may be erased after each interrogation. I've implemented a
 flag, (can also be set via environment variable) that will delete the files after computing the summary statistics.
-4. Ideally we should have another table with turbines and the turbine_id should be a foreignkey to that table.
-5. I've assumed that anomaly detection (power output drops) are to be calculated for each turbine individually.
-6. I've assumed that the data format (columns of interest and their datatypes) will remain the same.
-7. I've worked without the assumption that a particular turbine will always be in the same .csv file but
+5. Ideally we should have another table with turbines and the turbine_id should be a foreignkey to that table.
+6. I've assumed that anomaly detection (power output drops) are to be calculated for each turbine individually.
+7. I've assumed that the data format (columns of interest and their datatypes) will remain the same.
+8. I've worked without the assumption that a particular turbine will always be in the same .csv file but
 I've assumed that all data for a particular turbine will be in the same .csv file. 
-8. Not necessarily an assumption, more a mention, the .env file is pushed to the repo, this is not a good practice
+9. Not necessarily an assumption, more a mention, the .env file is pushed to the repo, this is not a good practice
 but i've done it for simplicity. In a real world scenario, the .env file should be gitignored.
 
 ## Design and implementation
