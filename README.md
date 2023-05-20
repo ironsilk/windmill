@@ -57,6 +57,8 @@ needed some debugging so i dropped it.
 6. Dockerfile can be improved to mount a volume for the datafiles and exclude tests folder from the image.
 7. Not all git commits have titles and are not that well structured, i've revisited the logic several times
 during the implementation.
+8. I would have liked to implement a lock mechanism for the datafiles, so that if the script is running and
+a user tries to fetch anomalies or data, he will be notified that the script is running and he should try again later.
 
 
 ## Installation
