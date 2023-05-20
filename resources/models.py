@@ -38,20 +38,20 @@ class ComputedData(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     turbine_id: Mapped[int] = mapped_column(Integer)
     compute_time_window: Mapped[int] = mapped_column(Integer)
-    start: Mapped[datetime.datetime] = mapped_column(DateTime)
-    end: Mapped[datetime.datetime] = mapped_column(DateTime)
+    timestamp: Mapped[datetime.datetime] = mapped_column(DateTime)
     min: Mapped[float] = mapped_column(Float)
     max: Mapped[float] = mapped_column(Float)
     average: Mapped[float] = mapped_column(Float)
 
+    anomalies: Mapped[Optional[List["Anomaly"]]] = relationship(back_populates="computed_data", lazy=None)
 
 @dataclass
-class Anomalies(db.Model):
+class Anomaly(db.Model):
     __tablename__ = 'anomalies'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    turbine_id: Mapped[int] = mapped_column(Integer)
-    compute_time_window: Mapped[int] = mapped_column(Integer)
-    start: Mapped[datetime.datetime] = mapped_column(DateTime)
-    end: Mapped[datetime.datetime] = mapped_column(DateTime)
     output_deviation: Mapped[float] = mapped_column(Float)
+    anomaly_timestamp: Mapped[datetime.datetime] = mapped_column(DateTime)
+
+    computed_data_id: Mapped[int] = mapped_column(ForeignKey('computed_data.id'))
+    computed_data: Mapped[Optional["ComputedData"]] = relationship(back_populates="anomalies", lazy=None)
