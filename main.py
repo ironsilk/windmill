@@ -1,17 +1,15 @@
-from flask_executor import Executor
+import os
 
 from dotenv import load_dotenv
-import os
-import json
-from itertools import groupby
+from flask import Flask
+from flask import jsonify
+from flask_cors import CORS
+from flask_executor import Executor
+from loguru import logger
 
 from resources.data import fetch_data
+from resources.db import db_get_anomalies
 from resources.models import db
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from loguru import logger
-from flask import Flask
-from apscheduler.schedulers.background import BackgroundScheduler
 
 load_dotenv()
 
@@ -19,7 +17,6 @@ load_dotenv()
 POSTGRES_USER = os.getenv("POSTGRES_USER")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DB_NAME = os.environ.get('DB_NAME')
-DB_CONNECTION_NAME = os.environ.get('DB_CONNECTION_NAME')
 DB_IP = os.environ.get('DB_IP')
 DB_PORT = os.environ.get('DB_PORT')
 
@@ -36,10 +33,6 @@ db.init_app(app)
 with app.app_context():
     # db.drop_all()
     db.create_all()
-    scheduler = BackgroundScheduler()
-    scheduler.start()
-
-scheduler.add_job(fetch_data, 'interval', minutes=1)
 
 
 @app.route('/', methods=['GET'])
@@ -54,9 +47,17 @@ def trigger_data_fetch():
     return "Data fetching triggered"
 
 
+@app.route('/anomalies', methods=['GET'])
+def get_anomalies():
+    anomalies = db_get_anomalies()
+    return jsonify(anomalies)
+
+
 if __name__ == '__main__':
     with app.app_context():
         fetch_data()
+    app.run(host='0.0.0.0', port=5001)
+
 
 
 
